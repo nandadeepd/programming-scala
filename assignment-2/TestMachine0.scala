@@ -2,7 +2,7 @@
 * @Author: Nandadeep Davuluru
 * @Date:   2018-10-05 15:24:34
 * @Last Modified by:   nandadeepd
-* @Last Modified time: 2018-10-05 18:06:40
+* @Last Modified time: 2018-10-06 17:16:00
 */
 
 import org.scalatest.FunSuite
@@ -18,6 +18,11 @@ class TestMachine0 extends FunSuite {
 	// (b) (2 * -3) - (5 / 3)
 	test("(2 * -3) - (5 / 3)") {
 		assert(exec(List(Const(2), Const(-3), Times, Const(5), Const(3), Divrem, Pop, Subtract), 2) == -7)
+	}
+
+	// (c) (-2 / 3) * 3 + (-2 % 3)
+	test("(-2 / 3) * 3 + (-2 % 3)") {
+		assert(exec(List(Const(-2), Const(3), Divrem, Pop, Const(3), Times, Const(-2), Const(3), Divrem, Swap, Pop, Plus), 2) == -2)
 	}
 
 
