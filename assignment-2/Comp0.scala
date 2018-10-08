@@ -9,11 +9,14 @@ import EL0._
 import Machine0._
 
 object Comp0 {
+
   def compile(e: Expr): Program = e match {
     case Num(i) => Const(i)::Nil
-
-      // ... add code ...
-
+    case Add(l, r) => compile(l) ::: compile(r) ::: Plus :: Nil
+    case Sub(l, r) => compile(l) ::: compile(r) ::: Subtract :: Nil
+    case Mul(l, r) => compile(l) ::: compile(r) ::: Times :: Nil
+    case Div(l, r) => compile(l) ::: compile(r) ::: Divrem :: Pop :: Nil
+    case Rem(l, r) => compile(l) ::: compile(r) ::: Divrem :: Swap :: Pop :: Nil
   }
 
   def process(s:String, debug:Int = 0): Int = {

@@ -1,4 +1,4 @@
-// <Put your name here>
+// Nandadeep Davuluru, davuluru@pdx.edu
 //-------------------------------------------------------------------------
 
 // EL0 Interpreter
@@ -14,9 +14,10 @@ object Interp0 {
     val v = e match {
       case Num(n) => n
       case Add(l,r) => interp(l) + interp(r)
-
-      // ... add code ...
-
+      case Sub(l, r) => interp(l) - interp(r)
+      case Mul(l, r) => interp(l) * interp(r)
+      case Div(l, r) => if (interp(r) == 0) {throw new InterpException("Divide by zero encountered")} else {interp(l) / interp(r)}
+      case Rem(l, r) => if (interp(r) == 0) {throw new InterpException("Divide by zero encountered")} else {interp(l) % interp(r)}
     }
     v
   }
