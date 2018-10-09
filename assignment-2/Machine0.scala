@@ -30,7 +30,7 @@ object Machine0 {
         val v1 = stk.pop()
       	stk.push(v1 + v2)
       }
-      // subtract function to the stack API
+      // subtract function to the stack API - testing purpose only. 
       case Subtract => {
         val v2 = stk.pop()
         val v1 = stk.pop()

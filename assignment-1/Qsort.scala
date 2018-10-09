@@ -1,3 +1,9 @@
+/*
+* @Author: Nandadeep Davuluru, davuluru@pdx.edu
+* @Date:   2018-09-27 15:10:21
+* @Last Modified by:   nandadeepd
+* @Last Modified time: 2018-10-03 17:05:50
+*/
 class Utilities {
 
   def swap(arr: Array[Int], i: Int, j: Int): Array[Int] = {

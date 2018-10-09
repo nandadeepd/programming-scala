@@ -1,3 +1,9 @@
+/*
+* @Author: Nandadeep Davuluru
+* @Date:   2018-10-08 12:47:02
+* @Last Modified by:   nandadeepd
+* @Last Modified time: 2018-10-08 19:10:36
+*/
 //-------------------------------------------------------------------------
 // Supporting code for CS558 Programming Languages. 
 // Dept of Computer Science, Portland State University
@@ -47,6 +53,11 @@ class TestInterp0 extends FunSuite {
 	
   test ("correctly interpret a complicated arithmetic expression") {
     assertResult(5)(process("(* 1 (+ 2 (- 3 (/ 4 (% 6 7)))))"))
+  }
+
+  // additional testcase (* (+ 2 5) (/ 21 7)) = 21 
+  test ("correctly interpret a complicated arithmetic expression - II") {
+    assertResult(21)(process("(* (+ 2 5) (/ 21 7))"))
   }
 	
 }
