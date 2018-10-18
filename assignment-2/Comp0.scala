@@ -10,6 +10,8 @@ import Machine0._
 
 object Comp0 {
 
+  case class CompException(string: String) extends RuntimeException
+
   def compile(e: Expr): Program = e match {
     case Num(i) => Const(i)::Nil
     case Add(l, r) => compile(l) ::: compile(r) ::: Plus :: Nil

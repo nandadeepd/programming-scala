@@ -2,11 +2,12 @@
 * @Author: Nandadeep Davuluru
 * @Date:   2018-10-07 16:28:50
 * @Last Modified by:   nandadeepd
-* @Last Modified time: 2018-10-08 14:00:44
+* @Last Modified time: 2018-10-09 17:23:02
 */
 
 import org.scalatest.FunSuite
 import Comp0._
+import Machine0._
 
 class TestComp0 extends FunSuite {
 
@@ -26,13 +27,13 @@ class TestComp0 extends FunSuite {
 
   // Exceptions are run time so not testing them in compiler. 
   
-  // test("correct behavior for div by 0") {
-  //   intercept[InterpException]{process("(/ 10 0)")}
-  // }
+  test("correct behavior for div by 0") {
+    intercept[ExecException]{process("(/ 10 0)")}
+  }
   
-  // test("correct behavior for rem by 0"){
-  //   intercept[InterpException]{process("(% 10 0)")}
-  // } 
+  test("correct behavior for rem by 0"){
+    intercept[ExecException]{process("(% 10 0)")}
+  } 
   
   test("correct behavior for rem positive by negative"){
     assertResult(1)(process("(% 10 -3)"))
