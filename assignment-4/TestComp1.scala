@@ -79,10 +79,6 @@ class TestComp1 extends FunSuite {
     intercept[ExecException]{process("(/ 7 0)")}
   }
 
-  // test("branching") {
-  //   process("(while 3 5)", 2)
-  // }
-
   test("le comparison") {
     assertResult(0){process("(<= 1 0)")}
     assertResult(1){process("(<= 0 0)")}
@@ -100,9 +96,9 @@ class TestComp1 extends FunSuite {
   }
   
   test("if result") {
-    assertResult(0){process("(if 1 0 1)", 2)}
-    assertResult(0){process("(if 0 1 0)", 2)}
-    assertResult(0){process("(if 2 0 1)", 2)}
+    assertResult(0){process("(if 1 0 1)")}
+    assertResult(0){process("(if 0 1 0)")}
+    assertResult(0){process("(if 2 0 1)")}
   }
   
   test("skip") {
@@ -123,10 +119,6 @@ class TestComp1 extends FunSuite {
     assertConsoleOutput("3\n2\n1\n",
       "(seq (:= s 3) (while s (seq (write s) (:= s (- s 1)))))")
   }
-
-  // test("Testing Seq") {
-  //   process("(seq (:= s 3) (:= s (- s 1)))", 2)
-  // }
 
   test("Simple for loops, each returns a 0") {
     assertResult(0){runSilent(easyProgram1)}

@@ -12,8 +12,8 @@ object Comp1 {
   var nextLabel: Int = 0
 
   def comp(e:Expr): Program = e match {
-    case Var(x) => Load(x)::Nil
-    case Num(i) => Const(i)::Nil
+    case Var(x) => Load(x) :: Nil
+    case Num(i) => Const(i) :: Nil
     case Add(e1, e2) => comp(e1) ::: comp(e2) ::: Plus :: Nil
     case Sub(e1, e2) => comp(e1) ::: comp(e2) ::: Const(-1) :: Times :: Plus :: Nil
     case Mul(e1, e2) => comp(e1) ::: comp(e2) ::: Times :: Nil
@@ -21,18 +21,22 @@ object Comp1 {
     case Rem(e1, e2) => comp(e1) ::: comp(e2) ::: Divrem :: Swap :: Pop :: Nil
     case Le(e1, e2)  => comp(e1) ::: comp(e2) ::: Lessequ :: Nil
     case Assgn(x, e) => comp(e) ::: Dup :: Store(x) :: Nil
-    // case While(c, b) => Label(0) :: Const(0) :: Nil ::: comp(c) ::: Branchz(1) :: Nil ::: comp(b) ::: Branch(0) :: Nil ::: Label(1) :: Pop :: Nil 
-    // case If(c, t, f)  => comp(c) ::: Dup :: Branchz(1) :: Nil ::: Branch(2) :: Nil ::: comp(t) ::: Swap :: Pop :: Nil ::: Label(1):: Nil ::: comp(f) ::: Pop :: Nil ::: Label(2) :: Nil
-
-
-    case If(c, t, f)  => comp(c) ::: Dup :: Branchz(1) :: Nil ::: comp(t) ::: Swap :: Pop :: Nil ::: Label(1) :: comp(f) ::: Pop :: Nil
-
-
-    // case If(c, t, f) => comp(c) ::: Dup :: Branchz(1) :: Branch(2) :: Branch(3) :: Nil ::: Label(1) :: comp(f) ::: Pop :: Nil ::: Label(2) :: comp(t) ::: Pop :: Nil ::: Label(3) :: Nil
+    case If(c, t, e)  => {
+      val a = newLabel(); val b = newLabel(); val d = newLabel();
+      comp(c) ::: Branchz(a) :: Branch(b) :: Label(a) :: comp(e) ::: Branch(d) :: Label(b) :: comp(t) ::: Branch(d) :: Label(d) :: Nil
+    }
+    case While(c, e) => {
+      val start = newLabel(); val done = newLabel();
+      Label(start) :: comp(c) ::: Branchz(done) :: comp(e) ::: Pop :: Branch(start) :: Label(done) :: Const(0) :: Nil
+    }
     case Write(e)   => comp(e) ::: Dup :: Print :: Nil
-    case Seq(e1, e2) => comp(e1) ::: comp(e2) ::: Pop :: Nil
+    case Seq(e1, e2) => comp(e1) ::: comp(e2) ::: Swap :: Pop :: Nil
     case Skip() => Const(0) :: Nil
-    // case For(x,e1,e2,e3) => // ... add code ...
+    case For(x, e1, e2, e3) => {
+      val while_label_start = newLabel(); val compute = newLabel();
+      comp(e1) ::: Store(x) :: Branch(while_label_start) :: comp(e2) ::: Load(x) :: Swap :: Lessequ :: Branchz(compute) :: Branch(done) 
+
+    }
   }
 
   def newLabel() = {
