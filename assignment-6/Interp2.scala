@@ -59,7 +59,7 @@ object Interp2 {
     override def toString: String = "[sp=" + stackPointer + "] " + super.toString
   }
 
-  type Env = Map[String,Addr]
+  type Env = Map[String, Addr]
 
   def interp(p:Program, debug:Int = 0): Int = {
     
@@ -79,7 +79,7 @@ object Interp2 {
       case StackAddr(i)  => stack.set(i,v)
     }
 
-    var genv : Env = Map[String,Addr]() // initial env, containing global vars
+    var genv : Env = Map[String, Addr]() // initial env, containing global vars
 
     def interpE(env:Env, e:Expr): Value = {
       if (debug > 1) {
@@ -94,48 +94,74 @@ object Interp2 {
           val a = env.getOrElse(x, throw InterpException("undefined variable:" + x))
           get(a)
         }
-        case Add(l,r) => (interpE(env,l),interpE(env,r)) match {
-          case (NumV(lv),NumV(rv)) => NumV(lv+rv)
+        case Add(l,r) => (interpE(env,l), interpE(env,r)) match {
+          case (NumV(lv),NumV(rv)) => NumV(lv + rv)
           case _ => throw InterpException("non-numeric argument to Add")
         }
-        case Sub(l,r) => 
+        case Sub(l, r) => (interpE(env,l), interpE(env,r)) match {
+          case (NumV(lv),NumV(rv)) => NumV(lv - rv)
+          case _ => throw InterpException("non-numeric argument to Sub")
+        }
 
-          // ... add code ...
+          
 
-        case Mul(l,r) => 
+        case Mul(l,r) => (interpE(env,l), interpE(env,r)) match {
+          case (NumV(lv),NumV(rv)) => NumV(lv * rv)
+          case _ => throw InterpException("non-numeric argument to Mul")
+        }
 
-          // ... add code ...
+          
 
-        case Le(l,r) => 
+        case Le(l,r) => (interpE(env,l), interpE(env,r)) match {
+          case (NumV(lv),NumV(rv)) => {
+            if (lv <= rv) NumV(1)
+            else NumV(0)
+          }
+          case _ => throw InterpException("Le exception case")
+        } 
 
-          // ... add code ...
+          
 
         case Eq(l,r) => 
           // evaluate l and r; compare the results based on ='s semantics
+          (interpE(env,l), interpE(env,r)) match {
+          case (NumV(lv),NumV(rv)) => {
+            if (lv == rv) NumV(1)
+            else NumV(0)
+          }
+          case (PairV(lv), PairV(rv)) => {
+            if(lv == rv) NumV(1)
+            else NumV(0)
+          }
+          case _ => throw InterpException("PairV exception")
+          
+        }
+          
 
-          // ... add code ...
-
-        case Deq(l,r) =>
-          // if you choose to implement this expr, replace the following line
-          // with actual code
-          throw InterpException("Deq implementation is optional")
+        // case Deq(l,r) =>
+        //   // if you choose to implement this expr, replace the following line
+        //   // with actual code
+        //   throw InterpException("Deq implementation is optional")
 
         case Assgn(x,e) => 
           // lookup x's address from env (error if not found, cf. Var(x)'s 
           // code); evaluate e, and set e's value to x; yield e's value as 
           // Assgn's value
+          val a = env.getOrElse(x, throw InterpException("undefined variable:" + x))
+          val t = interpE(env, e)
+          set(a, t)
+          t
+          
 
-          // ... add code ...
+        // case If(c,t,e) => 
 
-        case If(c,t,e) =>
-
-          // ... add code ...
+          
 
         case Write(e) => {
           val v = interpE(env,e)
           def show(v:Value): String = v match {
             case NumV(i) => "" + i
-            case PairV(a) => "(" + show(get(a)) + "." + show(get(a+1)) + ")"
+            case PairV(a) => "(" + show(get(a)) + "." + show(get(a + 1)) + ")"
           }
       	  println(show(v)); 
           v
@@ -146,41 +172,56 @@ object Interp2 {
           v2
         }
         case Skip() => NumV(0)
-        case Let(x,e,b) =>
+        case Let(x,e,b) => {
           // evaluate e to get a value, and bind it to x; x's value needs 
           // to be stored on the stack, use push() to get a stack address; 
           // x's binding needs to be added to env for evaluating b (only);
           // x's value needs to be removed before returning - use pop()
+          var x = interpE(env, e); var address = stack.push(); set(address, x);
+          val b_expr = interpE(env, b)
+          stack.pop()
+          b_expr
 
-          // ... add code ...
+          
+        }
+        case Pair(l,r) => {
 
-        case Pair(l,r) =>
+          val lv = interpE(env, l); val rv = interpE(env, r);
+          val address = heap.allocate(2); set(address , lv); set(address + 1, rv); 
+          PairV(address)
+
+
+        }
           // allocate (2 units of) space in the heap; store the pairs'
           // two values in the heap; return a pair value
 
-          // ... add code ...
+          
 
-        case IsPair(e) => 
-
-          // ... add code ...
-
-        case Fst(e) => {
-          case PairV(a) => get(a)
-          case _ => throw InterpException("non-pair argument to fst")
+        case IsPair(e) => (interpE(env, e)) match {
+          case PairV(something) => NumV(1)
+          case _ => NumV(0)
         }
-        case Snd(e) => 
 
-          // ... add code ...
+        // case Fst(e) => {
+        //   case PairV(a) => get(a)
+        //   case _ => throw InterpException("non-pair argument to fst")
+        // }
 
-        case SetFst(p,e) =>
-          // get p's address; evaluate e; use set() to update the
-          // value to p's first component
 
-          // ... add code ...
 
-        case SetSnd(p,e) =>
+        // case Snd(e) => 
 
-          // ... add code ...
+        
+
+        // case SetFst(p,e) =>
+        //   // get p's address; evaluate e; use set() to update the
+        //   // value to p's first component
+
+        
+
+        // case SetSnd(p,e) =>
+
+        
 
       }
     }
