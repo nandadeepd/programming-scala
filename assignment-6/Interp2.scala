@@ -143,7 +143,7 @@ object Interp2 {
         //   // with actual code
         //   throw InterpException("Deq implementation is optional")
 
-        case Assgn(x,e) => 
+        case Assgn(x,e) => {
           // lookup x's address from env (error if not found, cf. Var(x)'s 
           // code); evaluate e, and set e's value to x; yield e's value as 
           // Assgn's value
@@ -151,7 +151,7 @@ object Interp2 {
           val t = interpE(env, e)
           set(a, t)
           t
-          
+          }
 
         // case If(c,t,e) => 
 
@@ -172,24 +172,21 @@ object Interp2 {
           v2
         }
         case Skip() => NumV(0)
-        case Let(x,e,b) => {
-          // evaluate e to get a value, and bind it to x; x's value needs 
-          // to be stored on the stack, use push() to get a stack address; 
-          // x's binding needs to be added to env for evaluating b (only);
-          // x's value needs to be removed before returning - use pop()
-          var x = interpE(env, e); var address = stack.push(); set(address, x);
-          val b_expr = interpE(env, b)
-          stack.pop()
-          b_expr
+        // case Let(x,e,b) => {
+        //   // evaluate e to get a value, and bind it to x; x's value needs 
+        //   // to be stored on the stack, use push() to get a stack address; 
+        //   // x's binding needs to be added to env for evaluating b (only);
+        //   // x's value needs to be removed before returning - use pop()
+          
+        //   var x = 
 
           
-        }
+        // }
         case Pair(l,r) => {
 
           val lv = interpE(env, l); val rv = interpE(env, r);
           val address = heap.allocate(2); set(address , lv); set(address + 1, rv); 
           PairV(address)
-
 
         }
           // allocate (2 units of) space in the heap; store the pairs'
@@ -202,24 +199,44 @@ object Interp2 {
           case _ => NumV(0)
         }
 
-        // case Fst(e) => {
-        //   case PairV(a) => get(a)
-        //   case _ => throw InterpException("non-pair argument to fst")
-        // }
+        case Fst(e) => (interpE(env, e)) match{
+          case PairV(a) => get(a)
+          case _ => throw InterpException("non-pair argument to fst")
+        }
 
 
 
-        // case Snd(e) => 
+        case Snd(e) => (interpE(env, e)) match {
+          case PairV(a) => get(a + 1)
+          case _ => throw InterpException("non-pair argument to Snd")
+        
+        }
+
+        case SetFst(p,e) => (interpE(env, p)) match {
+
+          case PairV(pv) => {
+            val v = interpE(env, e)
+            set(pv, v)
+            PairV(pv)
+          }
+          case _ => throw InterpException("some error for now")
+
+        }
+          // get p's address; evaluate e; use set() to update the
+          // value to p's first component
 
         
 
-        // case SetFst(p,e) =>
-        //   // get p's address; evaluate e; use set() to update the
-        //   // value to p's first component
+        case SetSnd(p,e) => (interpE(env, p)) match {
 
-        
+          case PairV(pv) => {
+            val v = interpE(env, e)
+            set(pv + 1, v)
+            PairV(pv)
+          }
+          case _ => throw InterpException("some error for now")
 
-        // case SetSnd(p,e) =>
+        }
 
         
 

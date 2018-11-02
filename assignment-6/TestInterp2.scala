@@ -69,45 +69,45 @@ class TestInterp2 extends FunSuite {
     intercept[InterpException] { runExpr("(pair 1 2)") }
     assertExprOutput("(1.2)\n", "(seq (write (pair 1 2)) 0)")
     assertExprOutput("(1.(2.0))\n", "(seq (write (pair 1 (pair 2 0))) 0)")
-    // assertResult(3) { runExpr("(fst (pair 3 2))") }
-    // assertResult(6) { runExpr("(snd (pair 2 6))") }
-    // assertResult(-4) { run("(((a (pair 3 7))) (- (fst a) (snd a)))") }
-    // assertResult(6) { runExpr("(snd (snd (pair 2 (pair 2 6))))") }
+    assertResult(3) { runExpr("(fst (pair 3 2))") }
+    assertResult(6) { runExpr("(snd (pair 2 6))") }
+    assertResult(-4) { run("(((a (pair 3 7))) (- (fst a) (snd a)))") }
+    assertResult(6) { runExpr("(snd (snd (pair 2 (pair 2 6))))") }
     assertResult(1) { runExpr("(isPair (pair 2 6))") }
     assertResult(0) { runExpr("(isPair 3)") }
     assertExprOutput("1\n2\n", "(seq (pair (write 1) (write 2)) 0)")
-    // intercept[InterpException] { runExpr("(fst 0)") }
-    // intercept[InterpException] { runExpr("(snd 2)") }
+    intercept[InterpException] { runExpr("(fst 0)") }
+    intercept[InterpException] { runExpr("(snd 2)") }
     intercept[InterpException] { runExpr("(+ 0 (pair 1 2))") }
     intercept[InterpException] { runExpr("(<= (pair 1 2) (pair 3 4))") }    
   }
   
   // Let:
-  test ("constant let body returns correctly") {
-    assertResult(3) { runExpr("(let x 1 3)") }
-  }
+  // test ("constant let body returns correctly") {
+  //   assertResult(3) { runExpr("(let x 1 3)") }
+  // }
   
-  test("let variable shows up in environment") {
-    assertResult(7) { runExpr("(let x 1 (seq x 7))") }
-  }
+  // test("let variable shows up in environment") {
+  //   assertResult(7) { runExpr("(let x 1 (seq x 7))") }
+  // }
 
-  test("let variable evaluated correctly") {
-    assertResult(13) { runExpr("(let x 13 x)") }
-  }
+  // test("let variable evaluated correctly") {
+  //   assertResult(13) { runExpr("(let x 13 x)") }
+  // }
   
-  test("let variable shadows global variable") {
-    assertResult(5) { run("(((a 3)) (let a 5 a))") }
-  }
+  // test("let variable shadows global variable") {
+  //   assertResult(5) { run("(((a 3)) (let a 5 a))") }
+  // }
   
-  test("let variable shadows outer-scoped let variables") {
-    assertResult(4) { runExpr("(let x 3 (let x 4 x))") }
-    assertResult(4) { runExpr("(let x 3 (let x (+ 1 x) x))") }
-  }
+  // test("let variable shadows outer-scoped let variables") {
+  //   assertResult(4) { runExpr("(let x 3 (let x 4 x))") }
+  //   assertResult(4) { runExpr("(let x 3 (let x (+ 1 x) x))") }
+  // }
   
-  test("let order-of-evaluation: e is evaluated exactly once, before b") {
-    assertExprOutput("1\n2\n", 
-      "(let x (write 1) (seq (seq (seq (seq (seq x x) x) (write 2)) x) x))")
-  }
+  // test("let order-of-evaluation: e is evaluated exactly once, before b") {
+  //   assertExprOutput("1\n2\n", 
+  //     "(let x (write 1) (seq (seq (seq (seq (seq x x) x) (write 2)) x) x))")
+  // }
 
   // setFst/setSnd:
   test("setFst/setSnd order of evaluation") {
@@ -148,23 +148,23 @@ class TestInterp2 extends FunSuite {
                         (:= a 0)))
                   (+ a b)))))"""
 
-  test("example program for let") { assertResult(102) { run(exampleProgram) } }
+  // test("example program for let") { assertResult(102) { run(exampleProgram) } }
   
-  // Eq:
-  test("Eq tests") {
-    assertResult(1) { runExpr("(= (+ 2 4) (* 2 3))") } 
-    assertResult(0) { runExpr("(= (pair 2 4) (pair 2 4))") } 
-    assertResult(1) { run("(((x (pair 1 2))) (let y x (= x y)))") } 
-    intercept[InterpException] { runExpr("(= 5 (pair 1 2))") }
-  }
+  // // Eq:
+  // test("Eq tests") {
+  //   assertResult(1) { runExpr("(= (+ 2 4) (* 2 3))") } 
+  //   assertResult(0) { runExpr("(= (pair 2 4) (pair 2 4))") } 
+  //   assertResult(1) { run("(((x (pair 1 2))) (let y x (= x y)))") } 
+  //   intercept[InterpException] { runExpr("(= 5 (pair 1 2))") }
+  // }
 
-  // Deq:
-  test("Deq tests") {
-    assertResult(1) { runExpr("(== (+ 2 4) (* 2 3))") } 
-    assertResult(1) { runExpr("(== (pair 2 4) (pair 2 4))") } 
-    assertResult(1) { runExpr("(== (pair 2 (pair 1 3)) (pair 2 (pair 1 3)))") } 
-    assertResult(1) { run("(((x (pair 2 (pair 1 3)))) (== x (pair 2 (pair 1 3))))") } 
-    assertResult(0) { run("(((x (pair 1 2)) (y (pair 1 3))) (== x y))") } 
-    intercept[InterpException] { runExpr("(== 5 (pair 1 2))") }
-  }
+  // // Deq:
+  // test("Deq tests") {
+  //   assertResult(1) { runExpr("(== (+ 2 4) (* 2 3))") } 
+  //   assertResult(1) { runExpr("(== (pair 2 4) (pair 2 4))") } 
+  //   assertResult(1) { runExpr("(== (pair 2 (pair 1 3)) (pair 2 (pair 1 3)))") } 
+  //   assertResult(1) { run("(((x (pair 2 (pair 1 3)))) (== x (pair 2 (pair 1 3))))") } 
+  //   assertResult(0) { run("(((x (pair 1 2)) (y (pair 1 3))) (== x y))") } 
+  //   intercept[InterpException] { runExpr("(== 5 (pair 1 2))") }
+  // }
 }
