@@ -103,14 +103,10 @@ object Interp2 {
           case _ => throw InterpException("non-numeric argument to Sub")
         }
 
-          
-
         case Mul(l,r) => (interpE(env,l), interpE(env,r)) match {
           case (NumV(lv),NumV(rv)) => NumV(lv * rv)
           case _ => throw InterpException("non-numeric argument to Mul")
         }
-
-          
 
         case Le(l,r) => (interpE(env,l), interpE(env,r)) match {
           case (NumV(lv),NumV(rv)) => {
@@ -119,8 +115,6 @@ object Interp2 {
           }
           case _ => throw InterpException("Le exception case")
         } 
-
-          
 
         case Eq(l,r) => 
           // evaluate l and r; compare the results based on ='s semantics
@@ -137,11 +131,40 @@ object Interp2 {
           
         }
           
+        case Deq(l,r) => (interpE(env,l),interpE(env,r)) match {
+          case (NumV(lv),NumV(rv)) => {
+            if(lv == rv)
+              NumV(1)
+            else
+              NumV(0)
+          }
+          case (PairV(lv),PairV(rv)) => {
+            def parse_recursive(left: Value, right: Value): Boolean = {
+              (left,right) match {
+                case (NumV(lval),NumV(rval)) => {
+                  if(lval == rval)
+                    true
+                  else
+                    false
+                }
+                case (PairV(la),PairV(ra)) => {
+                  val ret_val = parse_recursive(get(la),get(ra)) && parse_recursive(get(la + 1),get(ra + 1))
+                  ret_val
+                }
+                case _ => false
+              }
+            }
+            if(parse_recursive(get(lv),get(rv)) && parse_recursive(get(lv + 1),get(rv + 1)))
+              NumV(1)
+            else
+              NumV(0)
+          }
+          case _ => throw InterpException("non-matching arguments to Deq")
+        }
+          // if you choose to implement this expr, replace the following line
+          // with actual code
 
-        // case Deq(l,r) =>
-        //   // if you choose to implement this expr, replace the following line
-        //   // with actual code
-        //   throw InterpException("Deq implementation is optional")
+          // throw InterpException("Deq implementation is optional")
 
         case Assgn(x,e) => {
           // lookup x's address from env (error if not found, cf. Var(x)'s 
@@ -153,7 +176,16 @@ object Interp2 {
           t
           }
 
-        // case If(c,t,e) => 
+        case If(c,t,e) => (interpE(env, c)) match {
+          case NumV(i) => {
+            if (i != 0) {
+              interpE(env, t)
+            } else {
+              interpE(env, e)
+            }
+          }
+          case _ => throw InterpException("non Int to If")
+        }
 
           
 
@@ -172,16 +204,22 @@ object Interp2 {
           v2
         }
         case Skip() => NumV(0)
-        // case Let(x,e,b) => {
-        //   // evaluate e to get a value, and bind it to x; x's value needs 
-        //   // to be stored on the stack, use push() to get a stack address; 
-        //   // x's binding needs to be added to env for evaluating b (only);
-        //   // x's value needs to be removed before returning - use pop()
-          
-        //   var x = 
+        case Let(x,e,b) => {
 
+          // evaluate e to get a value, and bind it to x; x's value needs 
+          // to be stored on the stack, use push() to get a stack address; 
+          // x's binding needs to be added to env for evaluating b (only);
+          // x's value needs to be removed before returning - use pop()
           
-        // }
+          var x_local = interpE(env, e);
+          var sAddr = stack.push();
+          set(sAddr, x_local)
+          val new_env = env + (x -> sAddr) // ignoring the key to this k, v pair. 
+          val retval = interpE(new_env, b)
+          stack.pop()
+          retval
+          
+        }
         case Pair(l,r) => {
 
           val lv = interpE(env, l); val rv = interpE(env, r);
@@ -219,7 +257,7 @@ object Interp2 {
             set(pv, v)
             PairV(pv)
           }
-          case _ => throw InterpException("some error for now")
+          case _ => throw InterpException("If setFst doesn't get pair")
 
         }
           // get p's address; evaluate e; use set() to update the
@@ -234,11 +272,9 @@ object Interp2 {
             set(pv + 1, v)
             PairV(pv)
           }
-          case _ => throw InterpException("some error for now")
+          case _ => throw InterpException("If setSnd doesn't get pair")
 
         }
-
-        
 
       }
     }
