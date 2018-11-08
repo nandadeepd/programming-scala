@@ -148,13 +148,13 @@ object Interp2 {
                     false
                 }
                 case (PairV(la),PairV(ra)) => {
-                  val ret_val = parse_recursive(get(la),get(ra)) && parse_recursive(get(la + 1),get(ra + 1))
+                  val ret_val = parse_recursive(get(la),get(ra)) && parse_recursive(get(la + 1), get(ra + 1))
                   ret_val
                 }
                 case _ => false
               }
             }
-            if(parse_recursive(get(lv),get(rv)) && parse_recursive(get(lv + 1),get(rv + 1)))
+            if(parse_recursive(get(lv),get(rv)) && parse_recursive(get(lv + 1), get(rv + 1)))
               NumV(1)
             else
               NumV(0)
