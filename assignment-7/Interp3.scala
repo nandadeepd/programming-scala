@@ -1,4 +1,4 @@
-// <Put your name here>
+// Nandadeep Davuluru, davuluru@pdx.edu
 //-------------------------------------------------------------------------
 
 // EL3 Interpreter
@@ -107,8 +107,14 @@ object Interp3 {
         case Div(l,r) => interpArithBinOp(env,l,r) ((lv,rv) => if (rv!=0) (lv/rv) else throw InterpException("divide by zero"))
         case Le(l,r)  => interpArithBinOp(env,l,r) ((lv,rv) => if (lv <= rv) 1 else 0)
         case If(c,t,e) => interpE(env,c) match {
-
-          // ... add code ...
+          case NumV(i) => {
+            if (i != 0) {
+              interpE(env, t)
+            } else {
+              interpE(env, e)
+            }
+          }
+          case _ => throw InterpException("non Int to If")
 
         }
         case Seq(e1,e2) => {
@@ -117,25 +123,66 @@ object Interp3 {
           v2
         }
         case Skip() => NumV(0)
-        case Let(x,b,e) => {
 
-          // ... add code ...
+        case Let(x, e, b) => {
 
+          var x_local = interpE(env, e);
+          var sAddr = stack.push();
+          set(sAddr, x_local)
+          val new_env = env + (x -> sAddr)
+          val retval = interpE(new_env, b)
+          stack.pop()
+          retval
         }
-        case LetRec(f,b,e) => {
+        case LetRec(f, b, e) => {
 
-          // ... add code ...
+          /* 
+          LetRec: as in LetRec(f, b, e)
+          is roughly the same as Let. The only difference is that, inside e, f must be accessible. 
+          In short, you must add the binding (f -> its address) to the environment when you interpret e.
+                                // f                  b                                 e
+          val facCode = """(letRec fac (fun n (if (<= n 1) 1 (* n (@ fac (- n 1))))) (@ fac 5))"""
+          */
 
+          val f_addr = stack.push(); 
+          val env_with_f = env + (f -> f_addr)
+          val b_closure = interpE(env_with_f, b)
+
+          b_closure match {
+            case ClosureV(x, innerB, cenv) => {
+              set(f_addr, b_closure)
+            } 
+            case _ => throw InterpException("B is not a closure")
+          }
+
+          val retval = interpE(env_with_f, e)
+          stack.pop()
+          retval
         }
+
+
         case Fun(x,b) => {
-
-          // ... add code ...
-
+          ClosureV(x, b, env)
         }
-        case Apply(f,e) => {
 
-          // ... add code ...
 
+        /*
+        Apply is passed a function and an expression.  
+        Interpret the function, and it should match a closure.  If not, it's an exception.  
+        Now you are inside a closure with a parameter name, expression, and environment
+        Interpret the outer expression passed to apply, map the formal parameter in the closure to that
+         */
+        case Apply(f, e) => interpE(env, f) match {
+          case ClosureV(pname, expr, cenv) => {
+            val someAddr = stack.push()
+            val outer_expr = interpE(env, e)
+            set(someAddr, outer_expr)
+            val local_env = cenv + (pname -> someAddr)
+            val some = interpE(local_env, expr)
+            stack.pop(); 
+            some
+          }
+          case _ => throw InterpException("not a closure") 
         }
       }
     }

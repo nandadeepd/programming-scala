@@ -110,8 +110,8 @@ object Interp2 {
 
         case Le(l,r) => (interpE(env,l), interpE(env,r)) match {
           case (NumV(lv),NumV(rv)) => {
-            if (lv <= rv) NumV(1)
-            else NumV(0)
+            if (lv <= rv) 1
+            else 0
           }
           case _ => throw InterpException("Le exception case")
         } 
