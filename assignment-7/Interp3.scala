@@ -124,6 +124,7 @@ object Interp3 {
         }
         case Skip() => NumV(0)
 
+        // modifying the storage models to use heap. 
         case Let(x, e, b) => {
 
           var x_local = interpE(env, e);
