@@ -1,0 +1,31 @@
+Nandadeep Davuluru, davuluru@pdx.edu
+
+--------------------------------------------
+
+
+1 & 2. first expression evaluates to 1 using stack and 2 using heap
+   second expression evaluates to an exception using stack and 4 using heap model.
+
+
+3. 
+
+(let f (fun x (fun y x)) (@ (@ f 2) 1))
+
+Stack:
+
+the value of 'f' initially is set to 2 because the expression is recursively broken into (@ f 2)
+Then, it returns the value 2 and moves to the "upper stack frame". Here, the value for f now is 1. 
+Hence, the final return value is 1. 
+
+Heap: 
+
+Heap is pretty much like "reverse" of stack frames. First the 'f' with value as 1 is evaluated followed by 
+(@ f 2). Hence the return value is 2. 
+
+(let f (let y 4 (fun x y)) (@ f 1))
+
+Stack:
+
+
+Heap:
+

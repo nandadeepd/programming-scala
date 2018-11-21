@@ -12,9 +12,6 @@ import Interp3._
 class TestInterp3 extends FunSuite {
   
 
-  // test("letrec") {
-  //   process("(letRec f (+ a 1) (@ f 3))")
-  // }
   test("test let" ) {
     assertResult(3) { process("(let x 1 (let y 2 (+ x y)))") }
     assertResult(4) { process("(let x 1 (let x 2 (+ x x)))") }
@@ -29,7 +26,7 @@ class TestInterp3 extends FunSuite {
     assertResult(26) { process("(let f (fun x (+ (* x x) 1)) (@ f 5))") }
   }
 
-  // // Free-variables storage (stack vs. heap)
+  // // // Free-variables storage (stack vs. heap)
 
   val example1 = """(@ (@ (fun x (fun y (+ x y))) 2) 3)"""
 
@@ -54,7 +51,6 @@ class TestInterp3 extends FunSuite {
   }
 
   // Factorial function
-                        // f                  b                                 e
   val facCode = """(letRec fac (fun n (if (<= n 1) 1 (* n (@ fac (- n 1))))) (@ fac 5))"""
 
   test("factorial function") {
@@ -73,7 +69,7 @@ class TestInterp3 extends FunSuite {
     assertResult(3) { process(example3,true,true) }
     assertResult(4) { process(example4,true,true) }
     assertResult(120) { process(facCode,true,true) }
-    assertResult(55) { process(facCode,true,true) }
+    // assertResult(55) { process(facCode,true,true) }
   }
 
   test("call-by-name (lazy-eval)") {

@@ -79,7 +79,7 @@ object Interp3 {
       case StackAddr(i) => stack.set(i,v)
     }
 
-    def interpVar(env:Env,x:String): Addr =
+    def interpVar(env:Env,x:String): Addr = 
       env.getOrElse(x, throw InterpException("undefined variable:" + x))
 
     def interpArithBinOp(env:Env,l: Expr, r:Expr) (op: (Int,Int) => Int) = {
@@ -92,6 +92,30 @@ object Interp3 {
     }
 
     def interpE(env:Env,e:Expr): Value = {
+        def replaceE(e: Expr, x: String, y: Expr): Expr = {
+          e match {
+            case Num(n) => e
+            case Var(x1) => {
+              if(x1 == x){
+                y
+              } else {
+                Var(x1)
+              }
+            }
+            case Add(l, r) => Add(replaceE(l, x, y), replaceE(r, x, y))
+            case Sub(l, r) => Sub(replaceE(l, x, y), replaceE(r, x, y))
+            case Mul(l, r) => Mul(replaceE(l, x, y), replaceE(r, x, y))
+            case Div(l, r) => Div(replaceE(l, x, y), replaceE(r, x, y))
+            case Le(l, r)  => Le(replaceE(l, x, y), replaceE(r, x, y))
+            case Let(id, e1, b) => Let(id, replaceE(e1, x, y), replaceE(b, x, y))
+            case Fun(p, b) => Fun(p, replaceE(b, x, y))
+            case Apply(f, e1) => Apply(replaceE(f, x, y), replaceE(e1, x, y))
+            case LetRec(id, b, e1) => LetRec(id, replaceE(b, x, y), replaceE(e1, x, y))
+            case If(c, t, e1) => If(replaceE(c, x, y), replaceE(t, x, y), replaceE(e1, x, y))
+            case Skip() => Skip()
+            case Seq(e1, e2) => Seq(replaceE(e1, x, y), replaceE(e2, x, y))
+          }
+      }
       if (debug > 1) {
         println("expr = "+ e)
         println("env = " + env)
@@ -125,8 +149,6 @@ object Interp3 {
         case Skip() => NumV(0)
 
         case Let(x, e, b) => {
-
-
           var x_local = interpE(env, e);
           if(useHeap) {
             var hAddr = heap.allocate(1);
@@ -144,39 +166,26 @@ object Interp3 {
             val retval = interpE(new_env, b)
             stack.pop()
             retval
-          }
-          
-          
-          
-          
+          } 
         }
         case LetRec(f, b, e) => {
-
-
           if(useHeap) {
-
             val f_hAddr = heap.allocate(1);
             val env_with_f = env + (f -> f_hAddr)
             val b_closure = interpE(env_with_f, b)
-
             b_closure match {
             case ClosureV(x, innerB, cenv) => {
               set(f_hAddr, b_closure)
               } 
             case _ => throw InterpException("B is not a closure")
             }
-
             val retval = interpE(env_with_f, e)
             retval
-
-
           } else {
             // stack 
             val f_addr = stack.push();
-          
             val env_with_f = env + (f -> f_addr)
             val b_closure = interpE(env_with_f, b)
-
             b_closure match {
               case ClosureV(x, innerB, cenv) => {
                 set(f_addr, b_closure)
@@ -187,10 +196,7 @@ object Interp3 {
             stack.pop()
             retval
           }
-
-          
         }
-
 
         case Fun(x,b) => {
           ClosureV(x, b, env)
@@ -198,34 +204,39 @@ object Interp3 {
 
         case Apply(f, e) => interpE(env, f) match {
           case ClosureV(pname, expr, cenv) => {
-
-            if(useHeap) {
-
-              val hSomeAddr = heap.allocate(1)
-              val outer_expr = interpE(env, e)
-              set(hSomeAddr, outer_expr)
-              val local_env = cenv + (pname -> hSomeAddr)
-              val some = interpE(local_env, expr) 
-              some
-
-
+            if(callByName) {
+              // performing beta reduction
+              val replaced_expr = replaceE(expr, pname, e)
+              val some = interpE(cenv, replaced_expr); some
             } else {
-
-              val someAddr = stack.push()
-              val outer_expr = interpE(env, e)
-              set(someAddr, outer_expr)
-              // using local scope for evaluating expr
-              val local_env = cenv + (pname -> someAddr)
-              val some = interpE(local_env, expr)
-              stack.pop(); 
-              some
+              if(useHeap) {
+                val hSomeAddr = heap.allocate(1)
+                val outer_expr = interpE(env, e)
+                set(hSomeAddr, outer_expr)
+                val local_env = cenv + (pname -> hSomeAddr)
+                val some = interpE(local_env, expr) 
+                some
+              } else {
+                val someAddr = stack.push()
+                val outer_expr = interpE(env, e)
+                set(someAddr, outer_expr)
+                // using local scope for evaluating expr
+                val local_env = cenv + (pname -> someAddr)
+                val some = interpE(local_env, expr)
+                stack.pop(); 
+                some
             }
-
-
             
+            
+            
+            
+            
+            }
           }
-          case _ => throw InterpException("not a closure") 
+          case _ => throw new InterpException("not a closure")
+
         }
+
       }
     }
 
