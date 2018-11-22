@@ -80,8 +80,7 @@ class TestInterp3 extends FunSuite {
   test("call-by-name with alpha-reduction") {
     assertResult(2) { process("(@ (fun x (let x 1 (+ x 1))) 5)",true,true) }
     assertResult(3) { process("(@ (@ (fun x (fun y (+ y 1))) 5) 2)",true,true) }
-    assertResult(3) { process("(let x 0 (@ (@ (fun y (fun x (+ x y))) (+ x 1)) 2))",
-                              true,true) }
+    assertResult(3) { process("(let x 0 (@ (@ (fun y (fun x (+ x y))) (+ x 1)) 2))", true,true) }
   }
 
 }

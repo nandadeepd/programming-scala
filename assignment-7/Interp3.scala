@@ -107,10 +107,10 @@ object Interp3 {
             case Mul(l, r) => Mul(replaceE(l, x, y), replaceE(r, x, y))
             case Div(l, r) => Div(replaceE(l, x, y), replaceE(r, x, y))
             case Le(l, r)  => Le(replaceE(l, x, y), replaceE(r, x, y))
-            case Let(id, e1, b) => Let(id, replaceE(e1, x, y), replaceE(b, x, y))
-            case Fun(p, b) => Fun(p, replaceE(b, x, y))
+            case Let(id, b, e1) => Let(id + "_", replaceE(replaceE(b, id, Var(id + "_")), x, y), replaceE(replaceE(e1, id, Var(id + "_")), x, y))
+            case Fun(p, b) => Fun(p + "_", replaceE(replaceE(b, p, Var(p + "_")), x, y))
             case Apply(f, e1) => Apply(replaceE(f, x, y), replaceE(e1, x, y))
-            case LetRec(id, b, e1) => LetRec(id, replaceE(b, x, y), replaceE(e1, x, y))
+            case LetRec(id, b, e1) => LetRec(id + "_", replaceE(replaceE(b, id, Var(id + "_")), x, y), replaceE(replaceE(e1, id, Var(id + "_")), x, y))
             case If(c, t, e1) => If(replaceE(c, x, y), replaceE(t, x, y), replaceE(e1, x, y))
             case Skip() => Skip()
             case Seq(e1, e2) => Seq(replaceE(e1, x, y), replaceE(e2, x, y))
@@ -226,11 +226,6 @@ object Interp3 {
                 stack.pop(); 
                 some
             }
-            
-            
-            
-            
-            
             }
           }
           case _ => throw new InterpException("not a closure")
