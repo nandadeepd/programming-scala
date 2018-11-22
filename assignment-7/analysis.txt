@@ -25,7 +25,10 @@ Heap is pretty much like "reverse" of stack frames. First the 'f' with value as 
 (let f (let y 4 (fun x y)) (@ f 1))
 
 Stack:
-
+With this expression, using stack, the expression (@ f 1) is first evaluated that applies 'f' to 1 which is chained to 'y'. 
+But, in our environment, we don't have a valid mapping for 'x' which leads to an exception. 
 
 Heap:
 
+Using heaps, since we're are appplying at the same level before stepping into another frame, it just discards 1
+and uses 4 for the function value and returns the same. 
