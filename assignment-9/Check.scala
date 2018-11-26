@@ -24,19 +24,99 @@ object Check {
       case Num(_)   => IntTy
       case Bool(_)  => BoolTy
       case Var(x)   => checkVar(env,x)
-      case Add(l,r) => // ... add code ...
-      case Sub(l,r) => // ... add code ...
-      case Mul(l,r) => // ... add code ...
-      case Div(l,r) => // ... add code ...
-      case And(l,r) => // ... add code ...
-      case Or(l,r)  => // ... add code ...
-      case Le(l,r)  => // ... add code ...
-      case If(c,t,e) => // ... add code ...
+      case Add(l,r) => {
+        checkE(env, l) match {
+          case IntTy => IntTy
+          case _ => throw TypingException("not a number type")
+        }
+        checkE(env, r) match {
+          case IntTy => IntTy
+          case _ => throw TypingException("not a number type")
+        }
+
+      }
+      case Sub(l,r) => {
+        checkE(env, l) match {
+          case IntTy => IntTy
+          case _ => throw TypingException("not a number type")
+          }
+        checkE(env, r) match {
+          case IntTy => IntTy
+          case _ => throw TypingException("not a number type")
+          }
+      }
+      case Mul(l,r) => {
+        checkE(env, l) match {
+          case IntTy => IntTy
+          case _ => throw TypingException("not a number type")
+        }
+        checkE(env, r) match {
+          case IntTy => IntTy
+          case _ => throw TypingException("not a number type")
+        }
+
+      }
+      case Div(l,r) => {
+        checkE(env, l) match {
+          case IntTy => IntTy
+          case _ => throw TypingException("not a number type")
+        }
+        checkE(env, r) match {
+          case IntTy => IntTy
+          case _ => throw TypingException("not a number type")
+        }
+
+      }
+      case And(l,r) => {
+        checkE(env, l) match {
+          case BoolTy => BoolTy
+          case _ => throw TypingException("AND left failed")
+        }
+        checkE(env, r) match {
+          case BoolTy => BoolTy
+          case _ => throw TypingException("AND right failed")
+        }
+
+      }
+      case Or(l,r)  => {
+        checkE(env, l) match {
+          case BoolTy => BoolTy
+          case _ => throw TypingException("OR left failed")
+        }
+        checkE(env, r) match {
+          case BoolTy => BoolTy
+          case _ => throw TypingException("OR right failed")
+        }
+      }
+      case Le(l,r)  => {
+        val lType = checkE(env, l)
+        lType match {
+          case IntTy => {}
+          case _ => throw TypingException("left has wrong type in LEQ")
+        }
+        val rType = checkE(env, r)
+        rType match {
+          case IntTy => {}
+          case _ => throw TypingException("right has wrong type in LEQ")
+        }
+        if (lType == rType) BoolTy
+        else throw TypingException("expr has wrong type in LEQ")
+      }
+      case If(c,t,e) => {
+        
+        val cType = checkE(env, c); cType match {
+          case BoolTy => BoolTy
+          case _ => throw TypingException("C isn't bool")
+        }
+        val tType = checkE(env, t)
+        if (tType == checkE(env, e)) tType
+        else throw TypingException("not type ty")
+      }
       case Seq(e1,e2) => { checkE(env,e1); checkE(env,e2) }
-      case Fun(p,t,b) => // ... add code ...
-      case Apply(f,e) => // ... add code ...
-      case Let(x,t,d,b) => // ... add code ...
-      case LetRec(x,t,d,b) => // ... add code ...
+      //case Fun(p,t,b) => // ... add code ...
+      //case Apply(f,e) => // ... add code ...
+      //case Let(x,t,d,b) => // ... add code ...
+      //case LetRec(x,t,d,b) => // ... add code ...
     }
     
     checkE(emptyEnv,e)
