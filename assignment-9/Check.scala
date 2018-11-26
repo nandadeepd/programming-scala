@@ -106,24 +106,29 @@ object Check {
         
         val cType = checkE(env, c); cType match {
           case BoolTy => BoolTy
-          case _ => throw TypingException("C isn't bool")
+          case _ => throw TypingException("C isn't bool in IF")
         }
         val tType = checkE(env, t)
         if (tType == checkE(env, e)) tType
-        else throw TypingException("not type ty")
+        else throw TypingException("not type ty in IF")
       }
       case Seq(e1,e2) => { checkE(env,e1); checkE(env,e2) }
 
+      // A Fun expression (fun x tx e) is well-typed and has type (funT tx ty) if e is well-typed in the
+      // augmented environment TE + (x->tx) and has type ty
       case Fun(p,t,b) => {
         val augmented_env = env + (p -> t)
         val bType = checkE(augmented_env, b)
         bType match {
           case IntTy => FunTy(t, IntTy)
           case BoolTy => FunTy(t, BoolTy)
-          case _ => throw TypingException("b is neither")
+          case FunTy(pt, rt) => FunTy(t, FunTy(pt, rt))
+          case _ => throw TypingException("b is none of the primitive or constructed type. ")
         }
         
       }
+      // An Application expression (@ f b) is well-typed and has a ty if f is well-typed and has type (funT
+      // tx ty), and b is well-typed and has type tx.
       case Apply(f,e) => {
         val fType = checkE(env, f) 
         fType match {
@@ -137,12 +142,19 @@ object Check {
                 if (pt == BoolTy) rt
                 else throw TypingException("E is not type ty - Bool")
               }
-              case _ => throw TypingException("e is neither")
+              case FunTy(pt1, rt1) => {
+                if (pt == pt1 && rt == rt1) rt
+                else throw TypingException("e is not Funty in Apply")
+              }
+              case _ => throw TypingException("e is neither in Apply")
             }
           }
           case _ => throw TypingException("f is not of type fun(tx ty)")
         }
       }
+
+      // A Let expression (let x tx e1 e2) is well-typed and has type t2 if e1 is well-typed in the current
+      // TE and has type tx, e2 is well-typed in the augmented environment TE + (x->tx) and has type t2.
       case Let(x,t,d,b) => {
         val dType = checkE(env, d)
         if (dType == t) {
@@ -152,9 +164,9 @@ object Check {
             case IntTy => IntTy
             case BoolTy => BoolTy
             case FunTy(pt, rt) => FunTy(pt, rt)
-            case _ => throw TypingException("e2 is messed up")
+            case _ => throw TypingException("e2 is messed up in Let")
           }
-        } else throw TypingException("e1 is messed up")
+        } else throw TypingException("e1 is messed up in Let")
       }
       case LetRec(x,t,d,b) => {
         t match {
@@ -167,11 +179,11 @@ object Check {
                 case IntTy => IntTy
                 case BoolTy => BoolTy
                 case FunTy(pt, rt) => FunTy(pt, rt) 
-                case _ => throw TypingException("bType is messed up")
+                case _ => throw TypingException("bType is messed up in LETREC")
               }
-            } else throw TypingException("dType is messed up")
+            } else throw TypingException("dType is messed up in LETREC")
           }
-          case _ => throw TypingException("T is not FunTy")
+          case _ => throw TypingException("T is not FunTy in LETREC")
         }
       }
     }

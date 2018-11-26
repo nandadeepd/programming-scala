@@ -64,9 +64,7 @@ class TestCheck extends FunSuite {
 
   // Free-variables
 
-  val example1 = """(@ (@ (fun x intT (fun y intT (+ x y))) 
-                          2) 
-                       3)"""
+  val example1 = """(@ (@ (fun x intT (fun y intT (+ x y))) 2) 3)"""
 
   val example2 = """(let f (funT intT (funT intT intT)) 
                          (fun x intT (fun y intT x))  
@@ -84,9 +82,9 @@ class TestCheck extends FunSuite {
 
   test("free variables" ) {
     assertConsoleOutput("", example1)
-    //assertConsoleOutput("", example2)
-    //assertConsoleOutput("", example3)
-    //assertConsoleOutput("", example4)
+    assertConsoleOutput("", example2)
+    assertConsoleOutput("", example3)
+    assertConsoleOutput("", example4)
   }
 
   // Factorial functions
