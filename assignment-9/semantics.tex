@@ -1,0 +1,54 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+
+
+% Math symbol guide 
+% \vdash
+% \oplus
+% \in
+
+
+\title{CS 558 Programming Languages}
+\author{Nandadeep Davuluru}
+\date{Fall 2018}
+
+\begin{document}
+
+\maketitle
+
+\section{Formal Semantics}
+
+    \subsection{Integer}
+    
+    \subsection{Boolean}
+    \subsection{Variable}
+        \begin{equation}
+            \frac{TE(x) = t}{TE \vdash x : T}
+        \end{equation}
+    \subsection{Arithmetic}
+        \begin{equation}
+            \frac{\oplus \in \{+, -, \div, *\} \tab TE \in e_1 : intT \tab TE \in e_2 : intT}{TE \vdash e_1 \oplus e_2 : intT}
+        \end{equation}
+    \subsection{Conditional}
+        \begin{equation}
+            \frac{\oplus \in \{\&\&, || \} \tab TE \in e_1 : boolT \tab TE \in e_2 : boolT}{TE \vdash e_1 \oplus e_2 : boolT}
+        \end{equation}
+    \subsection{Leq}
+        \begin{equation}
+            \frac{\oplus \in \{ <= \} \tab TE \in e_1 : intT \tab TE \in e_2 : intT}{TE \vdash e_1 \oplus e_2 : boolT}
+        \end{equation}
+    \subsection{If}
+         \begin{equation}
+            \frac{TE \in c : boolT \tab TE \in t : ty \tab TE \in f : ty}{TE \vdash \textbf{if c t f} : ty}
+        \end{equation}
+    \subsection{Seq}
+    \subsection{Fun}
+    \subsection{Let}
+    \subsection{LetRec}
+    
+
+
+
+\end{document}
