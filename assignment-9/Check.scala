@@ -113,10 +113,67 @@ object Check {
         else throw TypingException("not type ty")
       }
       case Seq(e1,e2) => { checkE(env,e1); checkE(env,e2) }
-      //case Fun(p,t,b) => // ... add code ...
-      //case Apply(f,e) => // ... add code ...
-      //case Let(x,t,d,b) => // ... add code ...
-      //case LetRec(x,t,d,b) => // ... add code ...
+
+      case Fun(p,t,b) => {
+        val augmented_env = env + (p -> t)
+        val bType = checkE(augmented_env, b)
+        bType match {
+          case IntTy => FunTy(t, IntTy)
+          case BoolTy => FunTy(t, BoolTy)
+          case _ => throw TypingException("b is neither")
+        }
+        
+      }
+      case Apply(f,e) => {
+        val fType = checkE(env, f) 
+        fType match {
+          case FunTy(pt, rt) => {
+            checkE(env, e) match {
+              case IntTy => {
+                if (pt == IntTy) rt
+                else throw TypingException("E is not type ty - Int")
+              }
+              case BoolTy => {
+                if (pt == BoolTy) rt
+                else throw TypingException("E is not type ty - Bool")
+              }
+              case _ => throw TypingException("e is neither")
+            }
+          }
+          case _ => throw TypingException("f is not of type fun(tx ty)")
+        }
+      }
+      case Let(x,t,d,b) => {
+        val dType = checkE(env, d)
+        if (dType == t) {
+          val aug_env = env + (x -> t)
+          val bType = checkE(aug_env, b)
+          bType match {
+            case IntTy => IntTy
+            case BoolTy => BoolTy
+            case FunTy(pt, rt) => FunTy(pt, rt)
+            case _ => throw TypingException("e2 is messed up")
+          }
+        } else throw TypingException("e1 is messed up")
+      }
+      case LetRec(x,t,d,b) => {
+        t match {
+          case FunTy(pt, rt) => {
+            val augm_env = env + (x -> t)
+            val dType = checkE(augm_env, d)
+            val bType = checkE(augm_env, b)
+            if (dType == t) {
+              bType match {
+                case IntTy => IntTy
+                case BoolTy => BoolTy
+                case FunTy(pt, rt) => FunTy(pt, rt) 
+                case _ => throw TypingException("bType is messed up")
+              }
+            } else throw TypingException("dType is messed up")
+          }
+          case _ => throw TypingException("T is not FunTy")
+        }
+      }
     }
     
     checkE(emptyEnv,e)
