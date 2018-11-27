@@ -29,26 +29,42 @@
         \end{equation}
     \subsection{Arithmetic}
         \begin{equation}
-            \frac{\oplus \in \{+, -, \div, *\} \tab TE \in e_1 : intT \tab TE \in e_2 : intT}{TE \vdash e_1 \oplus e_2 : intT}
+            \frac{\oplus \in \{+, -, \div, *\} \tab TE \vdash e_1 : intT \tab TE \vdash e_2 : intT}{TE \vdash e_1 \oplus e_2 : intT}
         \end{equation}
     \subsection{Conditional}
         \begin{equation}
-            \frac{\oplus \in \{\&\&, || \} \tab TE \in e_1 : boolT \tab TE \in e_2 : boolT}{TE \vdash e_1 \oplus e_2 : boolT}
+            \frac{\oplus \in \{\&\&, || \} \tab TE \vdash e_1 : boolT \tab TE \vdash e_2 : boolT}{TE \vdash e_1 \oplus e_2 : boolT}
         \end{equation}
     \subsection{Leq}
         \begin{equation}
-            \frac{\oplus \in \{ <= \} \tab TE \in e_1 : intT \tab TE \in e_2 : intT}{TE \vdash e_1 \oplus e_2 : boolT}
+            \frac{\oplus \in \{ <= \} \tab TE \vdash e_1 : intT \tab TE \vdash e_2 : intT}{TE \vdash e_1 \oplus e_2 : boolT}
         \end{equation}
     \subsection{If}
          \begin{equation}
-            \frac{TE \in c : boolT \tab TE \in t : ty \tab TE \in f : ty}{TE \vdash \textbf{if c t f} : ty}
+            \frac{TE \vdash c : boolT \tab TE \vdash t : ty \tab TE \vdash f : ty}{TE \vdash \textbf{if c t f} : ty}
         \end{equation}
     \subsection{Seq}
+        \begin{equation}
+            \frac{TE \vdash e_1 : t \tab TE \vdash e_2 : t_2}{TE \vdash \textbf{Seq e1 e2} : t_2}
+        \end{equation}
     \subsection{Fun}
+        \begin{equation}
+            \frac{TE' \vdash b : ty}{TE \vdash \textbf{fun p t b} : funT(tx, ty)}
+        \end{equation}
+        \textit{Note}: TE' is an augmented environment
+    \subsection{Apply}
+        \begin{equation}
+            \frac{TE \vdash f : funT(tx, ty) \tab TE \vdash b : tx}{TE \vdash \textbf{Apply f b} : ty}
+        \end{equation}
     \subsection{Let}
+        \begin{equation}
+            \frac{TE \vdash b : tx \tab TE' \vdash d : t_2}{TE \vdash \textbf{let x t b d} : t_2}
+        \end{equation}
+        \textit{Note}: TE' is an augmented environment
     \subsection{LetRec}
+        \begin{equation}
+            \frac{t : funT \tab TE' \vdash b : tx \tab TE' \vdash d : t_2}{TE \vdash \textbf{letRec x t b d} : t_2}
+        \end{equation}
+        \textit{Note}: TE' is an augmented environment
     
-
-
-
 \end{document}
