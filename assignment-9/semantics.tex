@@ -20,9 +20,15 @@
 
 \section{Formal Semantics}
 
-    \subsection{Integer}
-    
-    \subsection{Boolean}
+    \subsection{Integer and Boolean}
+        \begin{equation}
+            \frac{}{TE \vdash n : intT}
+        \end{equation}
+
+        \begin{equation}
+            \frac{}{TE \vdash l_1 : boolT}
+        \end{equation}
+
     \subsection{Variable}
         \begin{equation}
             \frac{TE(x) = t}{TE \vdash x : T}
@@ -49,7 +55,7 @@
         \end{equation}
     \subsection{Fun}
         \begin{equation}
-            \frac{TE' \vdash b : ty}{TE \vdash \textbf{fun p t b} : funT(tx, ty)}
+            \frac{TE + \{x \Rightarrow t\} \vdash b : ty}{TE \vdash \textbf{fun p t b} : funT(tx, ty)}
         \end{equation}
         \textit{Note}: TE' is an augmented environment
     \subsection{Apply}
@@ -58,13 +64,11 @@
         \end{equation}
     \subsection{Let}
         \begin{equation}
-            \frac{TE \vdash b : tx \tab TE' \vdash d : t_2}{TE \vdash \textbf{let x t b d} : t_2}
+            \frac{TE \vdash b : tx \tab TE + \{x \Rightarrow t\} \vdash d : t_2}{TE \vdash \textbf{let x t b d} : t_2}
         \end{equation}
-        \textit{Note}: TE' is an augmented environment
     \subsection{LetRec}
         \begin{equation}
-            \frac{t : funT \tab TE' \vdash b : tx \tab TE' \vdash d : t_2}{TE \vdash \textbf{letRec x t b d} : t_2}
+            \frac{t : funT \tab TE' \vdash b : tx \tab TE + \{x \Rightarrow t\} \vdash d : t_2}{TE \vdash \textbf{letRec x t b d} : t_2}
         \end{equation}
-        \textit{Note}: TE' is an augmented environment
     
 \end{document}
