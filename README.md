@@ -7,5 +7,5 @@
 
   ``` make testint3 && ./run TestInterp3 ```
   - modify `testint3` to desired interpreter/compiler model. 
-- The master points to implementations done using stack storage model
-- The heap-storage points to implementations done using heap allocation. 
+- The master branch points to implementations done using stack storage model
+- The heap-storage branch points to implementations done using heap allocation. 
